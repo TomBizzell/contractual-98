@@ -2,13 +2,6 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 
 interface ContractInputProps {
@@ -18,7 +11,6 @@ interface ContractInputProps {
 
 export const ContractInput = ({ onSubmit, isLoading }: ContractInputProps) => {
   const [address, setAddress] = useState("");
-  const [network, setNetwork] = useState("flare");
   const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,7 +20,7 @@ export const ContractInput = ({ onSubmit, isLoading }: ContractInputProps) => {
       return;
     }
     setError("");
-    onSubmit(address, network);
+    onSubmit(address, "flare"); // Default to flare network
   };
 
   return (
@@ -45,24 +37,6 @@ export const ContractInput = ({ onSubmit, isLoading }: ContractInputProps) => {
             disabled={isLoading}
           />
           {error && <p className="text-red-500 text-sm">{error}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="network">Network</Label>
-          <Select
-            value={network}
-            onValueChange={setNetwork}
-            disabled={isLoading}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select network" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="flare">Flare Network</SelectItem>
-              <SelectItem value="songbird">Songbird</SelectItem>
-              <SelectItem value="coston">Coston Testnet</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         <button
