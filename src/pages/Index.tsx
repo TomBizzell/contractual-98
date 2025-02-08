@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ContractInput } from "@/components/ContractInput";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [analysis, setAnalysis] = useState<string | null>(null);
@@ -12,15 +13,24 @@ const Index = () => {
   const handleAnalyzeContract = async (address: string, network: string) => {
     setIsLoading(true);
     try {
-      // This is a placeholder for the actual API call
-      // We'll implement this in the next phase
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setAnalysis("Sample analysis of the smart contract...");
-      toast({
-        title: "Analysis Complete",
-        description: "Your smart contract has been successfully analyzed.",
+      const { data, error } = await supabase.functions.invoke('analyze-contract', {
+        body: {
+          contract_address: address,
+          network: network,
+        },
       });
+
+      if (error) throw error;
+
+      if (data.source_code) {
+        setAnalysis(data.source_code);
+        toast({
+          title: "Analysis Complete",
+          description: "Your smart contract has been successfully analyzed.",
+        });
+      }
     } catch (error) {
+      console.error('Error analyzing contract:', error);
       toast({
         title: "Error",
         description: "Failed to analyze the smart contract. Please try again.",
