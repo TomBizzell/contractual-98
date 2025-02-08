@@ -2,6 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ReactMarkdown from 'react-markdown';
 
 interface ResultsDisplayProps {
   analysis: string | null;
@@ -32,7 +33,7 @@ export const ResultsDisplay = ({ analysis, aiAnalysis, isLoading }: ResultsDispl
               </div>
             ) : (
               <div className="prose max-w-none">
-                <p className="text-dapp-primary whitespace-pre-wrap">{aiAnalysis}</p>
+                <ReactMarkdown>{aiAnalysis || ''}</ReactMarkdown>
               </div>
             )}
           </ScrollArea>
