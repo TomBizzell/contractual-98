@@ -11,7 +11,12 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleAnalyzeContract = async (address: string, network: string) => {
+  const handleAnalyzeContract = async (
+    address: string, 
+    network: string, 
+    analysisType: string, 
+    jurisdiction: string
+  ) => {
     setIsLoading(true);
     try {
       // First, get the source code
@@ -32,6 +37,8 @@ const Index = () => {
           body: {
             source_code: sourceData.source_code,
             contract_address: address,
+            analysis_type: analysisType,
+            jurisdiction: jurisdiction,
           },
         });
 

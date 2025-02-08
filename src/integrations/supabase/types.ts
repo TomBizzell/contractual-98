@@ -13,9 +13,11 @@ export type Database = {
         Row: {
           ai_analysis: string | null
           analysis_result: string | null
+          analysis_type: string
           contract_address: string
           created_at: string | null
           id: string
+          jurisdiction: string | null
           network: string
           source_code: string | null
           updated_at: string | null
@@ -23,9 +25,11 @@ export type Database = {
         Insert: {
           ai_analysis?: string | null
           analysis_result?: string | null
+          analysis_type?: string
           contract_address: string
           created_at?: string | null
           id?: string
+          jurisdiction?: string | null
           network: string
           source_code?: string | null
           updated_at?: string | null
@@ -33,9 +37,11 @@ export type Database = {
         Update: {
           ai_analysis?: string | null
           analysis_result?: string | null
+          analysis_type?: string
           contract_address?: string
           created_at?: string | null
           id?: string
+          jurisdiction?: string | null
           network?: string
           source_code?: string | null
           updated_at?: string | null

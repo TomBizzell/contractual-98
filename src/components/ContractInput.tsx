@@ -3,15 +3,18 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { AnalysisOptions } from "./AnalysisOptions";
 
 interface ContractInputProps {
-  onSubmit: (address: string, network: string) => void;
+  onSubmit: (address: string, network: string, analysisType: string, jurisdiction: string) => void;
   isLoading?: boolean;
 }
 
 export const ContractInput = ({ onSubmit, isLoading }: ContractInputProps) => {
   const [address, setAddress] = useState("");
   const [error, setError] = useState("");
+  const [analysisType, setAnalysisType] = useState("general");
+  const [jurisdiction, setJurisdiction] = useState("us");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +23,7 @@ export const ContractInput = ({ onSubmit, isLoading }: ContractInputProps) => {
       return;
     }
     setError("");
-    onSubmit(address, "flare"); // Default to flare network
+    onSubmit(address, "flare", analysisType, jurisdiction);
   };
 
   return (
@@ -38,6 +41,13 @@ export const ContractInput = ({ onSubmit, isLoading }: ContractInputProps) => {
           />
           {error && <p className="text-red-500 text-sm">{error}</p>}
         </div>
+
+        <AnalysisOptions
+          analysisType={analysisType}
+          jurisdiction={jurisdiction}
+          onAnalysisTypeChange={setAnalysisType}
+          onJurisdictionChange={setJurisdiction}
+        />
 
         <button
           type="submit"

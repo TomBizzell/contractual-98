@@ -12,6 +12,32 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const getPromptForAnalysisType = (
+  sourceCode: string,
+  analysisType: string,
+  jurisdiction?: string
+) => {
+  switch (analysisType) {
+    case 'memorandum':
+      return `Generate a formal memorandum of agreement that reflects this smart contract's terms and conditions. Consider the owners of the wallet addresses involved as the parties to the contract. Apply ${jurisdiction} jurisdiction and legal framework.
+
+Key points to address:
+1. Clearly identify the parties (wallet addresses as legal entities)
+2. Define the terms and conditions as specified in the smart contract
+3. Include relevant legal clauses and protections under ${jurisdiction} law
+4. Specify enforcement mechanisms and dispute resolution procedures
+5. Format as a proper legal document
+
+Here's the smart contract source code to base the memorandum on:
+
+${sourceCode}`;
+    
+    case 'general':
+    default:
+      return `Analyze this smart contract and explain in plain English what it does. Include its main functionality, any notable features, and potential use cases. Here's the source code:\n\n${sourceCode}`;
+  }
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -22,9 +48,9 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    const { source_code, contract_address } = await req.json();
+    const { source_code, contract_address, analysis_type, jurisdiction } = await req.json();
     
-    const prompt = `Analyze this smart contract and explain in plain English what it does. Include its main functionality, any notable features, and potential use cases. Here's the source code:\n\n${source_code}`;
+    const prompt = getPromptForAnalysisType(source_code, analysis_type, jurisdiction);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -33,9 +59,12 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         messages: [
-          { role: 'system', content: 'You are an expert at analyzing smart contracts. Provide clear, concise explanations of their functionality.' },
+          { 
+            role: 'system', 
+            content: 'You are an expert at analyzing smart contracts and generating legal documents. Provide clear, detailed explanations and properly formatted documents based on the request type.' 
+          },
           { role: 'user', content: prompt }
         ],
       }),
@@ -48,7 +77,11 @@ serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const { error: updateError } = await supabase
       .from('contract_analyses')
-      .update({ ai_analysis: analysis })
+      .update({ 
+        ai_analysis: analysis,
+        analysis_type,
+        jurisdiction
+      })
       .eq('contract_address', contract_address);
 
     if (updateError) {
