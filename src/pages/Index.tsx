@@ -11,6 +11,8 @@ import { useWeb3 } from "@/context/Web3Context";
 import { ethers } from "ethers";
 import { CONTRACT_ANALYZER_ABI, CONTRACT_ANALYZER_ADDRESS } from "@/contracts/ContractAnalyzer";
 
+const AVALANCHE_CHAIN_ID = '0xa86a'; // 43114 in hex
+
 const Index = () => {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
@@ -18,6 +20,42 @@ const Index = () => {
   const [analysisType, setAnalysisType] = useState("general");
   const { toast } = useToast();
   const { provider, account } = useWeb3();
+
+  const ensureAvalancheNetwork = async () => {
+    if (!window.ethereum) {
+      throw new Error("MetaMask not found");
+    }
+
+    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    if (chainId !== AVALANCHE_CHAIN_ID) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: AVALANCHE_CHAIN_ID }],
+        });
+      } catch (switchError: any) {
+        // This error code indicates that the chain has not been added to MetaMask
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: AVALANCHE_CHAIN_ID,
+              chainName: 'Avalanche C-Chain',
+              nativeCurrency: {
+                name: 'AVAX',
+                symbol: 'AVAX',
+                decimals: 18
+              },
+              rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
+              blockExplorerUrls: ['https://snowtrace.io/']
+            }],
+          });
+        } else {
+          throw switchError;
+        }
+      }
+    }
+  };
 
   const handleAnalyzeContract = async (
     address: string, 
@@ -37,6 +75,9 @@ const Index = () => {
     setIsLoading(true);
     setAnalysisType(analysisType);
     try {
+      // Ensure we're on Avalanche network
+      await ensureAvalancheNetwork();
+
       // First, get the source code
       const { data: sourceData, error: sourceError } = await supabase.functions.invoke('analyze-contract', {
         body: {
@@ -88,11 +129,11 @@ const Index = () => {
           description: "Your smart contract has been successfully analyzed and stored on-chain.",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error analyzing contract:', error);
       toast({
         title: "Error",
-        description: "Failed to analyze the smart contract. Please try again.",
+        description: error.message || "Failed to analyze the smart contract. Please try again.",
         variant: "destructive",
       });
     } finally {
