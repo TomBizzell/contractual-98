@@ -9,6 +9,7 @@ const Index = () => {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [analysisType, setAnalysisType] = useState("general");
   const { toast } = useToast();
 
   const handleAnalyzeContract = async (
@@ -18,6 +19,7 @@ const Index = () => {
     jurisdiction: string
   ) => {
     setIsLoading(true);
+    setAnalysisType(analysisType);
     try {
       // First, get the source code
       const { data: sourceData, error: sourceError } = await supabase.functions.invoke('analyze-contract', {
@@ -78,7 +80,12 @@ const Index = () => {
         </div>
 
         <ContractInput onSubmit={handleAnalyzeContract} isLoading={isLoading} />
-        <ResultsDisplay analysis={analysis} aiAnalysis={aiAnalysis} isLoading={isLoading} />
+        <ResultsDisplay 
+          analysis={analysis} 
+          aiAnalysis={aiAnalysis} 
+          isLoading={isLoading}
+          analysisType={analysisType}
+        />
       </div>
     </div>
   );
