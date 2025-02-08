@@ -7,6 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
+import { useWeb3 } from "@/context/Web3Context";
+import { ethers } from "ethers";
+import { CONTRACT_ANALYZER_ABI, CONTRACT_ANALYZER_ADDRESS } from "@/contracts/ContractAnalyzer";
 
 const Index = () => {
   const [analysis, setAnalysis] = useState<string | null>(null);
@@ -14,6 +17,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [analysisType, setAnalysisType] = useState("general");
   const { toast } = useToast();
+  const { provider, account } = useWeb3();
 
   const handleAnalyzeContract = async (
     address: string, 
@@ -21,6 +25,15 @@ const Index = () => {
     analysisType: string, 
     jurisdiction: string
   ) => {
+    if (!provider || !account) {
+      toast({
+        title: "Error",
+        description: "Please connect your wallet first",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     setAnalysisType(analysisType);
     try {
@@ -51,11 +64,27 @@ const Index = () => {
 
         if (aiData.analysis) {
           setAiAnalysis(aiData.analysis);
+          
+          // Store the analysis on-chain
+          const contract = new ethers.Contract(
+            CONTRACT_ANALYZER_ADDRESS,
+            CONTRACT_ANALYZER_ABI,
+            provider.getSigner()
+          );
+
+          const tx = await contract.addAnalysis(
+            address,
+            aiData.analysis,
+            analysisType,
+            jurisdiction
+          );
+
+          await tx.wait();
         }
 
         toast({
           title: "Analysis Complete",
-          description: "Your smart contract has been successfully analyzed.",
+          description: "Your smart contract has been successfully analyzed and stored on-chain.",
         });
       }
     } catch (error) {

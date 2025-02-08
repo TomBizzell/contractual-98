@@ -1,4 +1,3 @@
-
 export const CONTRACT_ANALYZER_ABI = [
   {
     "inputs": [
@@ -156,4 +155,4 @@ export const CONTRACT_ANALYZER_ABI = [
   }
 ];
 
-export const CONTRACT_ANALYZER_ADDRESS = ""; // This will be filled after deployment
+export const CONTRACT_ANALYZER_ADDRESS = "0x1234567890123456789012345678901234567890"; // Replace with actual deployed address
