@@ -66,10 +66,11 @@ const Index = () => {
           setAiAnalysis(aiData.analysis);
           
           // Store the analysis on-chain
+          const signer = await provider.getSigner();
           const contract = new ethers.Contract(
             CONTRACT_ANALYZER_ADDRESS,
             CONTRACT_ANALYZER_ABI,
-            provider.getSigner()
+            signer
           );
 
           const tx = await contract.addAnalysis(
