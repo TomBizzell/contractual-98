@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       contract_analyses: {
         Row: {
+          ai_analysis: string | null
           analysis_result: string | null
           contract_address: string
           created_at: string | null
@@ -20,6 +21,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          ai_analysis?: string | null
           analysis_result?: string | null
           contract_address: string
           created_at?: string | null
@@ -29,6 +31,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          ai_analysis?: string | null
           analysis_result?: string | null
           contract_address?: string
           created_at?: string | null

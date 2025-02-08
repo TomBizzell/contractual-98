@@ -7,23 +7,40 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [analysis, setAnalysis] = useState<string | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleAnalyzeContract = async (address: string, network: string) => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('analyze-contract', {
+      // First, get the source code
+      const { data: sourceData, error: sourceError } = await supabase.functions.invoke('analyze-contract', {
         body: {
           contract_address: address,
           network: network,
         },
       });
 
-      if (error) throw error;
+      if (sourceError) throw sourceError;
 
-      if (data.source_code) {
-        setAnalysis(data.source_code);
+      if (sourceData.source_code) {
+        setAnalysis(sourceData.source_code);
+        
+        // Then, get the AI analysis
+        const { data: aiData, error: aiError } = await supabase.functions.invoke('analyze-with-ai', {
+          body: {
+            source_code: sourceData.source_code,
+            contract_address: address,
+          },
+        });
+
+        if (aiError) throw aiError;
+
+        if (aiData.analysis) {
+          setAiAnalysis(aiData.analysis);
+        }
+
         toast({
           title: "Analysis Complete",
           description: "Your smart contract has been successfully analyzed.",
@@ -54,7 +71,7 @@ const Index = () => {
         </div>
 
         <ContractInput onSubmit={handleAnalyzeContract} isLoading={isLoading} />
-        <ResultsDisplay analysis={analysis} isLoading={isLoading} />
+        <ResultsDisplay analysis={analysis} aiAnalysis={aiAnalysis} isLoading={isLoading} />
       </div>
     </div>
   );
