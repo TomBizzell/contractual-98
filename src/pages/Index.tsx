@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ContractInput } from "@/components/ContractInput";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
@@ -17,6 +18,7 @@ const Index = () => {
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [analysisType, setAnalysisType] = useState("general");
+  const [analyzedContractAddress, setAnalyzedContractAddress] = useState<string | null>(null);
   const { toast } = useToast();
   const { provider, account, connect, isConnecting } = useWeb3();
 
@@ -73,6 +75,8 @@ const Index = () => {
 
     setIsLoading(true);
     setAnalysisType(analysisType);
+    setAnalyzedContractAddress(address);
+    
     try {
       // Ensure we're on Avalanche network
       await ensureAvalancheNetwork();
@@ -105,7 +109,7 @@ const Index = () => {
         if (aiData.analysis) {
           setAiAnalysis(aiData.analysis);
           
-          // Store the analysis on-chain
+          // Store the analysis on-chain and show contract address
           const signer = await provider.getSigner();
           const contract = new ethers.Contract(
             CONTRACT_ANALYZER_ADDRESS,
@@ -121,12 +125,12 @@ const Index = () => {
           );
 
           await tx.wait();
-        }
 
-        toast({
-          title: "Analysis Complete",
-          description: "Your smart contract has been successfully analyzed and stored on-chain.",
-        });
+          toast({
+            title: "Analysis Complete",
+            description: `Your smart contract has been successfully analyzed and stored on-chain. Contract Analyzer Address: ${CONTRACT_ANALYZER_ADDRESS}`,
+          });
+        }
       }
     } catch (error: any) {
       console.error('Error analyzing contract:', error);
@@ -135,6 +139,7 @@ const Index = () => {
         description: error.message || "Failed to analyze the smart contract. Please try again.",
         variant: "destructive",
       });
+      setAnalyzedContractAddress(null);
     } finally {
       setIsLoading(false);
     }
@@ -190,6 +195,21 @@ const Index = () => {
         {account && (
           <>
             <ContractInput onSubmit={handleAnalyzeContract} isLoading={isLoading} />
+            
+            {analyzedContractAddress && (
+              <Card className="mt-4 p-4 bg-green-50">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm font-medium text-green-800">Contract Address:</p>
+                    <p className="text-sm text-green-600">{analyzedContractAddress}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-green-800">Analyzer Contract:</p>
+                    <p className="text-sm text-green-600">{CONTRACT_ANALYZER_ADDRESS}</p>
+                  </div>
+                </div>
+              </Card>
+            )}
             
             <ResultsDisplay 
               analysis={analysis} 
