@@ -8,12 +8,13 @@ import { AnalysisOptions } from "./AnalysisOptions";
 interface ContractInputProps {
   onSubmit: (address: string, network: string, analysisType: string, jurisdiction: string) => void;
   isLoading?: boolean;
+  defaultAnalysisType?: string;
 }
 
-export const ContractInput = ({ onSubmit, isLoading }: ContractInputProps) => {
+export const ContractInput = ({ onSubmit, isLoading, defaultAnalysisType }: ContractInputProps) => {
   const [address, setAddress] = useState("");
   const [error, setError] = useState("");
-  const [analysisType, setAnalysisType] = useState("general");
+  const [analysisType, setAnalysisType] = useState(defaultAnalysisType || "general");
   const [jurisdiction, setJurisdiction] = useState("us");
 
   const handleSubmit = (e: React.FormEvent) => {

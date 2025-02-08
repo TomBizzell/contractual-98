@@ -48,6 +48,36 @@ export type Database = {
         }
         Relationships: []
       }
+      iframe_sessions: {
+        Row: {
+          analysis_type: string | null
+          contract_address: string | null
+          created_at: string | null
+          id: string
+          jurisdiction: string | null
+          network: string | null
+          pdf_url: string | null
+        }
+        Insert: {
+          analysis_type?: string | null
+          contract_address?: string | null
+          created_at?: string | null
+          id?: string
+          jurisdiction?: string | null
+          network?: string | null
+          pdf_url?: string | null
+        }
+        Update: {
+          analysis_type?: string | null
+          contract_address?: string | null
+          created_at?: string | null
+          id?: string
+          jurisdiction?: string | null
+          network?: string | null
+          pdf_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
