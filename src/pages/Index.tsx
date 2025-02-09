@@ -42,9 +42,14 @@ const Index = () => {
           />
         </div>
 
-        <p className="text-dapp-accent text-lg max-w-2xl mx-auto mb-12">
-          Turn your smart contract into an agreement memorandum, based on your jurisdiction
-        </p>
+        <div className="space-y-2 text-center mb-12">
+          <p className="text-dapp-accent text-lg max-w-2xl mx-auto">
+            Turn your smart contract into an agreement memorandum, based on your jurisdiction
+          </p>
+          <p className="text-dapp-accent text-sm max-w-2xl mx-auto">
+            An embeddable widget that uses Avalanche to save the generations to additional smart contracts and Flare to validate the etherscan source code queries for the targetted smart contracts
+          </p>
+        </div>
 
         {!account && (
           <div className="p-6 mb-8 text-center">
