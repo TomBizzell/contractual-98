@@ -33,7 +33,7 @@ const Index = () => {
       <div className="container max-w-4xl mx-auto py-12 px-4">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold text-dapp-primary">
-            Smart Contract Analyzer
+            Smart Memorandum Generator
           </h1>
           <WalletConnector 
             account={account}
