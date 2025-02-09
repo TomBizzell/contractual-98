@@ -43,7 +43,7 @@ const Index = () => {
         </div>
 
         <p className="text-dapp-accent text-lg max-w-2xl mx-auto mb-12">
-          Enter your smart contract address and let AI explain its functionality in plain English
+          Turn your smart contract into an agreement memorandum, based on your jurisdiction
         </p>
 
         {!account && (
