@@ -41,24 +41,27 @@ serve(async (req) => {
       throw new Error(`Etherscan API Error: ${etherscanData.message}`)
     }
 
-    // Verify the Etherscan response using Flare
-    const verifierResponse = await fetch(`${VERIFIER_URL}verify`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': VERIFIER_API_KEY
-      },
-      body: JSON.stringify({
-        type: 'etherscan',
-        data: etherscanData,
-        address: contract_address
+    let isVerifiedByFlare = false;
+    try {
+      // Attempt Flare verification but don't block on failure
+      const verifierResponse = await fetch(`${VERIFIER_URL}verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': VERIFIER_API_KEY
+        },
+        body: JSON.stringify({
+          type: 'etherscan',
+          data: etherscanData,
+          address: contract_address
+        })
       })
-    })
 
-    const verifierData = await verifierResponse.json()
-    
-    if (!verifierData.verified) {
-      throw new Error('Flare verification failed: Source code verification mismatch')
+      const verifierData = await verifierResponse.json()
+      isVerifiedByFlare = verifierData.verified === true
+    } catch (error) {
+      // Silently continue if Flare verification fails
+      console.log('Flare verification failed:', error)
     }
 
     const result = etherscanData.result[0]
@@ -83,7 +86,7 @@ serve(async (req) => {
         contract_address,
         network,
         source_code,
-        verified_by_flare: true
+        verified_by_flare: isVerifiedByFlare
       })
 
     if (dbError) {
@@ -94,7 +97,7 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         source_code,
-        verified_by_flare: true
+        verified_by_flare: isVerifiedByFlare
       }),
       {
         headers: {
