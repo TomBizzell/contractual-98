@@ -1,1 +1,2 @@
-A tool to quickly understand smart contracts
+An embeddable widget to quickly convert smart contracts into traditional legal memorandums.
+Deployed with docs at smartcontractual.netlify.app
